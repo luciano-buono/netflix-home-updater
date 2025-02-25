@@ -1,7 +1,8 @@
 import re
 import base64
 
-from src.emails.constants import EMAIL_LABEL_NETFLIX
+
+EMAIL_LABEL_NETFLIX = "Label_3325193623226064180"
 
 
 def extract_specific_line(text, keyword):
