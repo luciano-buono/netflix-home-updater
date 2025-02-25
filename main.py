@@ -2,14 +2,13 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import base64
+from selenium_task import open_link_and_click
 import re
 import os
 
-# Gmail API Scopes
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 
 def gmail_authenticate():
-    """Authenticate and create Gmail API service."""
     creds = None
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
@@ -22,15 +21,12 @@ def gmail_authenticate():
 
 
 def extract_specific_line(text, keyword):
-    """Extract lines containing the specific keyword."""
     lines = text.splitlines()
     matching_lines = [line for line in lines if keyword in line]
     return matching_lines
 
 
-def get_latest_email(service, user_id="me"):
-    """Fetch the latest email and extract specific lines."""
-    # List messages
+def get_latest_email_link(service, user_id="me"):
     results = (
         service.users()
         .messages()
@@ -43,8 +39,7 @@ def get_latest_email(service, user_id="me"):
         print("No emails found.")
         return
 
-    print(messages)
-    # Get the latest message
+
     msg_id = messages[0]["id"]
     msg = (
         service.users()
@@ -53,8 +48,7 @@ def get_latest_email(service, user_id="me"):
         .execute()
     )
 
-    print(msg.get('snippet'))
-    # Decode the email body
+
     data = ""
     payload = msg.get("payload", {})
     if "body" in payload and "data" in payload["body"]:
@@ -68,14 +62,14 @@ def get_latest_email(service, user_id="me"):
     if data:
         email_body = base64.urlsafe_b64decode(data).decode("utf-8")
 
-        # Extract lines with 'update-primary-location'
         keyword = "update-primary-location"
         matching_lines = extract_specific_line(email_body, keyword)
 
         if matching_lines:
-            print("Lines containing 'update-primary-location':")
             for line in matching_lines:
-                print(line)
+                match = re.search(r"<(https?://[^>]+)>", line)
+                link = match.group(1)
+                return link
         else:
             print("No matching lines found.")
     else:
@@ -83,8 +77,9 @@ def get_latest_email(service, user_id="me"):
 
 
 if __name__ == "__main__":
-    # Authenticate and create Gmail API service
     service = gmail_authenticate()
 
-    # Get and print specific lines from the latest email
-    get_latest_email(service)
+    link = get_latest_email_link(service)
+    
+    open_link_and_click(link)
+
