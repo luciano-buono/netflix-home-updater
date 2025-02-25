@@ -11,11 +11,6 @@ def extract_specific_line(text, keyword):
     return matching_lines
 
 
-def extract_link(raw_msg):
-    match = re.search(r"<(https?://[^>]+)>", raw_msg)
-    return match.group(1)
-
-
 def get_emails_by_label(service, label, user_id="me"):
     results = (
         service.users()
@@ -27,7 +22,6 @@ def get_emails_by_label(service, label, user_id="me"):
         )
         .execute()
     )
-
     messages = results.get("messages", [])
 
     if not messages:
@@ -66,7 +60,8 @@ def get_latest_email_link(service, user_id="me"):
 
         if matching_lines:
             for line in matching_lines:
-                return extract_link(line)
+                match = re.search(r"<(https?://[^>]+)>", line)
+                return match.group(1)
         else:
             print("No matching lines found.")
     else:
