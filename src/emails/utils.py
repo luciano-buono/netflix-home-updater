@@ -31,6 +31,20 @@ def get_emails_by_label(service, label, user_id="me"):
     return messages
 
 
+def get_labels(service, user_id="me"):
+    results = service.users().labels().list(userId=user_id).execute()
+    labels = results.get("labels", [])
+
+    if not labels:
+        print("No labels found.")
+        return
+
+    for label in labels:
+        print(f"ID: {label['id']}, Name: {label['name']}")
+
+    return labels
+
+
 def get_latest_email_link(service, user_id="me"):
     messages = get_emails_by_label(service, EMAIL_LABEL_NETFLIX, user_id)
 
