@@ -6,10 +6,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import base64
-from email import message_from_bytes
-import re
 import os
-from bs4 import BeautifulSoup
 
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
@@ -24,7 +21,7 @@ def gmail_authenticate():
         creds = flow.run_local_server(port=0)
         with open("token.json", "w") as token:
             token.write(creds.to_json())
-    return build('gmail', 'v1', credentials=creds)
+    return build("gmail", "v1", credentials=creds)
 
 
 def extract_specific_line(text, keyword):
@@ -59,7 +56,7 @@ def get_latest_email(service, user_id="me"):
         .execute()
     )
 
-    print(msg.get('snippet'))
+    print(msg.get("snippet"))
     # Decode the email body
     data = ""
     payload = msg.get("payload", {})
