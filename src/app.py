@@ -1,6 +1,7 @@
-from fastapi import FastAPI, Request
 from email import message_from_bytes
 from email.message import Message
+
+from fastapi import FastAPI, Request
 
 from parse import get_netflix_link
 
@@ -25,9 +26,7 @@ async def webhook(request: Request):
             content_disposition = part.get("Content-Disposition")
 
             # Extract plain text body
-            if content_type == "text/plain" and "attachment" not in str(
-                content_disposition
-            ):
+            if content_type == "text/plain" and "attachment" not in str(content_disposition):
                 email_data = part.as_string()
     else:
         # If email is not multipart, extract the payload directly
