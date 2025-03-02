@@ -1,6 +1,5 @@
-import re
 import base64
-
+import re
 
 EMAIL_LABEL_NETFLIX = "Label_3325193623226064180"
 
@@ -49,12 +48,7 @@ def get_latest_email_link(service, user_id="me"):
     messages = get_emails_by_label(service, EMAIL_LABEL_NETFLIX, user_id)
 
     msg_id = messages[0]["id"]
-    msg = (
-        service.users()
-        .messages()
-        .get(userId=user_id, id=msg_id, format="full")
-        .execute()
-    )
+    msg = service.users().messages().get(userId=user_id, id=msg_id, format="full").execute()
 
     data = ""
     payload = msg.get("payload", {})

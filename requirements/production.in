@@ -1,0 +1,2 @@
+# Packages used for production
+-r base.in

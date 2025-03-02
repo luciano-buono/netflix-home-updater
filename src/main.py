@@ -1,13 +1,12 @@
-from src.selenium.selenium_task import open_link_and_click
-
-from src.emails.utils import get_latest_email_link
+import base64
+import os
 
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-import base64
-import os
 
+from src.emails.utils import get_latest_email_link
+from src.selenium.selenium_task import open_link_and_click
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 
@@ -35,10 +34,7 @@ def get_latest_email(service, user_id="me"):
     """Fetch the latest email and extract specific lines."""
     # List messages
     results = (
-        service.users()
-        .messages()
-        .list(userId=user_id, maxResults=1, labelIds=["Label_3325193623226064180"])
-        .execute()
+        service.users().messages().list(userId=user_id, maxResults=1, labelIds=["Label_3325193623226064180"]).execute()
     )
     messages = results.get("messages", [])
 
@@ -49,12 +45,7 @@ def get_latest_email(service, user_id="me"):
     print(messages)
     # Get the latest message
     msg_id = messages[0]["id"]
-    msg = (
-        service.users()
-        .messages()
-        .get(userId=user_id, id=msg_id, format="full")
-        .execute()
-    )
+    msg = service.users().messages().get(userId=user_id, id=msg_id, format="full").execute()
 
     print(msg.get("snippet"))
     # Decode the email body
