@@ -27,6 +27,12 @@ def handle_confirm(driver):
     confirmation_button.click()
 
 
+def element_present(driver, by, locator):
+    """Checks if an element is NOT present."""
+    elements = driver.find_elements(by, locator)
+    return len(elements) != 0
+
+
 def handle_login(driver, email, password):
     try:
         # Attempt to find login elements
@@ -84,7 +90,14 @@ def open_link_and_click(link):
     try:
         driver.get(link)
 
-        if not load_cookies(driver, COOKIE_FILE):
+        if load_cookies(driver, COOKIE_FILE):
+            if element_present(driver, By.NAME, "userLoginId"):
+                print("Cookies expired. Logging in again.")
+                os.remove(COOKIE_FILE)
+                handle_login(driver, email=NETFLIX_EMAIL, password=NETFLIX_PASSWORD)
+                save_cookies(driver, COOKIE_FILE)
+
+        else:
             handle_login(driver, email=NETFLIX_EMAIL, password=NETFLIX_PASSWORD)
             save_cookies(driver, COOKIE_FILE)
 
