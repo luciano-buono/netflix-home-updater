@@ -28,15 +28,16 @@ def handle_confirm(driver):
 
 
 def element_present(driver, by, locator):
-    """Checks if an element is NOT present."""
-    elements = driver.find_elements(by, locator)
-    return len(elements) != 0
+    try:
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((by, locator)))
+        return True
+    except:
+        return False
 
 
 def handle_login(driver, email, password):
     try:
-        # Attempt to find login elements
-        email_input = WebDriverWait(driver, 5).until(
+        email_input = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.NAME, "userLoginId"))
         )
         email_input.send_keys(email)
@@ -51,12 +52,9 @@ def handle_login(driver, email, password):
         )
 
         submit_button.click()
-        # if login was needed, wait for the confirmation button
 
     except TimeoutException:
-        # Login elements not found, user is likely already logged in
         print("Login elements not found. Assuming user is already logged in.")
-        # Proceed directly to the confirmation button
         confirmation_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR, "button[data-uia='set-primary-location-action']")
@@ -87,24 +85,12 @@ def open_link_and_click(link):
 
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
-    try:
-        driver.get(link)
+    driver.get(link)
 
-        if load_cookies(driver, COOKIE_FILE):
-            if element_present(driver, By.NAME, "userLoginId"):
-                print("Cookies expired. Logging in again.")
-                os.remove(COOKIE_FILE)
-                handle_login(driver, email=NETFLIX_EMAIL, password=NETFLIX_PASSWORD)
-                save_cookies(driver, COOKIE_FILE)
+    if element_present(driver, By.NAME, "userLoginId"):
+        handle_login(driver, email=NETFLIX_EMAIL, password=NETFLIX_PASSWORD)
 
-        else:
-            handle_login(driver, email=NETFLIX_EMAIL, password=NETFLIX_PASSWORD)
-            save_cookies(driver, COOKIE_FILE)
-
-        handle_confirm(driver)
-
-    finally:
-        driver.quit()
+    handle_confirm(driver)
 
 
 # Ensure the function runs only if the file is executed directly
