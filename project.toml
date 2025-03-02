@@ -1,0 +1,12 @@
+[project]
+id = "io.buildpacks.methizul-netflix-home-updater"
+name = "netflix home updater"
+version = "1.0.0"
+
+[[build.env]]
+name = "BP_CPYTHON_VERSION"
+value = "3.13.*"
+
+[[build.env]]
+name = "BP_PIP_REQUIREMENT"
+value = "requirements/development.txt"
