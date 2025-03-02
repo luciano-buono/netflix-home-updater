@@ -1,0 +1,15 @@
+# Packages used for development
+-r base.in
+
+coverage
+# flake8
+# pep8
+# autopep8
+
+# linters
+# pylama
+# pylint
+# pylama-pylint
+# pydocstyle
+# pycodestyle
+# eradicate
