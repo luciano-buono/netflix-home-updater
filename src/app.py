@@ -4,6 +4,7 @@ from email.message import Message
 from fastapi import FastAPI, Request
 
 from parse import get_netflix_link
+from src.selenium.selenium_task import open_link_and_click
 
 app = FastAPI()
 
@@ -36,7 +37,7 @@ async def webhook(request: Request):
 
     link = get_netflix_link(email_data=email_data)
     print(link)
-
+    open_link_and_click(link)
 
 if __name__ == "__main__":
     import uvicorn
