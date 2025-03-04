@@ -1,2 +1,0 @@
-NETFLIX_EMAIL = "test"
-NETFLIX_PASSWORD = "test"

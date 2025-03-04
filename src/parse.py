@@ -2,7 +2,7 @@ import os
 from email import message_from_file
 from email.message import Message
 
-NETFLIX_LINK_START = ["www.netflix.com/account/update-primary", "www.netflix.com/account/set-primary"]
+NETFLIX_LINK_START = ["https://www.netflix.com/account/update-primary", "https://www.netflix.com/account/set-primary"]
 
 
 def parse_email_from_file(file_path: str):

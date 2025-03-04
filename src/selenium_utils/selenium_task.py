@@ -1,14 +1,13 @@
-import time
 import pickle
 import os
 
-from src.selenium.constants import NETFLIX_EMAIL, NETFLIX_PASSWORD
+from selenium_utils.constants import NETFLIX_EMAIL, NETFLIX_PASSWORD, test_link
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
-from src.selenium.utils import handle_login
+from selenium_utils.utils import handle_login
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,20 +15,25 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 COOKIE_FILE = "netflix_cookies.pkl"
-
+REQUEST_WAIT_TIME=5
 
 def handle_confirm(driver):
-    confirmation_button = WebDriverWait(driver, 10).until(
+    print('Attemting to update household..')
+    if element_present(driver, By.CSS_SELECTOR, "div[data-uia='upl-invalid-token']"):
+        print('Link not valid. probably expired')
+        return 1
+    confirmation_button = WebDriverWait(driver, REQUEST_WAIT_TIME).until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR, "button[data-uia='set-primary-location-action']")
         )
     )
     confirmation_button.click()
+    print('Household updated')
 
 
 def element_present(driver, by, locator):
     try:
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((by, locator)))
+        WebDriverWait(driver, REQUEST_WAIT_TIME).until(EC.presence_of_element_located((by, locator)))
         return True
     except:
         return False
@@ -37,19 +41,23 @@ def element_present(driver, by, locator):
 
 def handle_login(driver, email, password):
     try:
-        email_input = WebDriverWait(driver, 10).until(
+        email_input = WebDriverWait(driver, REQUEST_WAIT_TIME).until(
             EC.presence_of_element_located((By.NAME, "userLoginId"))
         )
         email_input.send_keys(email)
 
-        password_input = WebDriverWait(driver, 5).until(
+        password_input = WebDriverWait(driver, REQUEST_WAIT_TIME).until(
             EC.presence_of_element_located((By.NAME, "password"))
         )
         password_input.send_keys(password)
 
-        submit_button = WebDriverWait(driver, 5).until(
+        submit_button = WebDriverWait(driver, REQUEST_WAIT_TIME).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "button[type='submit']"))
         )
+
+        # # Uncomment this to use user interaction to log in
+        # WebDriverWait(driver, timeout=1000, poll_frequency=1) \
+        # .until(EC.staleness_of(submit_button))
 
         submit_button.click()
 
@@ -82,11 +90,11 @@ def open_link_and_click(link):
     service = ChromeService(ChromeDriverManager().install())
     chrome_options = Options()
     chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("user-data-dir=selenium-cache/")
 
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
     driver.get(link)
-
     if element_present(driver, By.NAME, "userLoginId"):
         handle_login(driver, email=NETFLIX_EMAIL, password=NETFLIX_PASSWORD)
 
@@ -95,4 +103,4 @@ def open_link_and_click(link):
 
 # Ensure the function runs only if the file is executed directly
 if __name__ == "__main__":
-    open_link_and_click()
+    open_link_and_click(test_link)
