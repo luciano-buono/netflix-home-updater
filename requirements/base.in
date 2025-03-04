@@ -4,3 +4,4 @@ google-auth-oauthlib
 selenium
 fastapi
 uvicorn
+webdriver_manager
