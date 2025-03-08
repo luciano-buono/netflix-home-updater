@@ -5,6 +5,8 @@ from fastapi import FastAPI, Request
 
 from parse import get_netflix_link
 from selenium_utils.selenium_task import open_link_and_click
+from utils.logger import logger
+from utils.constants import PORT, SELENIUM_USER_DATA_DIR
 
 app = FastAPI()
 
@@ -27,7 +29,9 @@ async def webhook(request: Request):
             content_disposition = part.get("Content-Disposition")
 
             # Extract plain text body
-            if content_type == "text/plain" and "attachment" not in str(content_disposition):
+            if content_type == "text/plain" and "attachment" not in str(
+                content_disposition
+            ):
                 email_data = part.as_string()
     else:
         # If email is not multipart, extract the payload directly
@@ -36,10 +40,13 @@ async def webhook(request: Request):
             email_data = email_message.as_string()
 
     link = get_netflix_link(email_data=email_data)
-    print(link)
+    logger.info(f"Link parsed from 📧: {link}")
     open_link_and_click(link)
+
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("app:app", port=8000, log_level="info", reload=True, host="0.0.0.0")
+    logger.info(f"Start listening on PORT:{PORT}")
+    logger.info(f"Using selenium user data dir: {SELENIUM_USER_DATA_DIR}")
+    uvicorn.run("app:app", port=PORT, log_level="info", reload=True, host="0.0.0.0")

@@ -1,26 +1,30 @@
-import pickle
 import os
-
-from selenium_utils.constants import NETFLIX_EMAIL, NETFLIX_PASSWORD, test_link
+import pickle
+import time
 
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium_utils.utils import handle_login
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
+from utils.constants import (
+    NETFLIX_EMAIL,
+    NETFLIX_PASSWORD,
+    SELENIUM_REMOTE_URL,
+    SELENIUM_USER_DATA_DIR,
+    test_link,
+)
+from utils.logger import logger
 
 COOKIE_FILE = "netflix_cookies.pkl"
-REQUEST_WAIT_TIME=5
+REQUEST_WAIT_TIME = 5
+
 
 def handle_confirm(driver):
-    print('Attemting to update household..')
+    logger.info("Attemting to update household..")
     if element_present(driver, By.CSS_SELECTOR, "div[data-uia='upl-invalid-token']"):
-        print('Link not valid. probably expired')
+        logger.warning("Link not valid. probably expired")
         return 1
     confirmation_button = WebDriverWait(driver, REQUEST_WAIT_TIME).until(
         EC.element_to_be_clickable(
@@ -28,12 +32,14 @@ def handle_confirm(driver):
         )
     )
     confirmation_button.click()
-    print('Household updated')
+    logger.info("Household updated")
 
 
 def element_present(driver, by, locator):
     try:
-        WebDriverWait(driver, REQUEST_WAIT_TIME).until(EC.presence_of_element_located((by, locator)))
+        WebDriverWait(driver, REQUEST_WAIT_TIME).until(
+            EC.presence_of_element_located((by, locator))
+        )
         return True
     except:
         return False
@@ -87,18 +93,24 @@ def load_cookies(driver, filepath):
 
 
 def open_link_and_click(link):
-    service = ChromeService(ChromeDriverManager().install())
-    chrome_options = Options()
-    chrome_options.add_argument("--headless=new")
-    chrome_options.add_argument("user-data-dir=selenium-cache/")
+    options = webdriver.ChromeOptions()
+    # options.add_argument("--headless")  # Run Chrome in headless mode
+    options.add_argument("--no-sandbox")  # Bypass OS security restrictions
+    options.add_argument("--disable-dev-shm-usage")  # Prevent shared memory issues
+    options.add_argument(f"--user-data-dir={SELENIUM_USER_DATA_DIR}")
 
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-
-    driver.get(link)
-    if element_present(driver, By.NAME, "userLoginId"):
-        handle_login(driver, email=NETFLIX_EMAIL, password=NETFLIX_PASSWORD)
-
-    handle_confirm(driver)
+    try:
+        # Connect to Selenium WebDriver inside Docker
+        driver = webdriver.Remote(command_executor=SELENIUM_REMOTE_URL, options=options)
+        driver.get(link)
+        if element_present(driver, By.NAME, "userLoginId"):
+            logger.info("Attempting to log in to Netflix..")
+            handle_login(driver, email=NETFLIX_EMAIL, password=NETFLIX_PASSWORD)
+        handle_confirm(driver)
+        time.sleep(10)  # Keep it open for VNC viewing
+    finally:
+        print("🛑 Closing browser...")
+        driver.quit()
 
 
 # Ensure the function runs only if the file is executed directly

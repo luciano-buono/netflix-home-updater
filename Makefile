@@ -14,15 +14,19 @@ VERSION?=0.1
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "⚡ \033[34m%-30s\033[0m %s\n", $$1, $$2}'
 
-build-requirements:
+build-pack-requirements:
 	# TODO: Right now requirements file is loaded hardcoded in project.toml
-  # Paketo does not support ARM, use Heroku buildpack
-  # requirements.txt must be in rootdir, cannot be defined with variable
-  # https://github.com/heroku/buildpacks/blob/main/docs/python/README.md
+	# Paketo does not support ARM, use Heroku buildpack
+	# requirements.txt must be in rootdir, cannot be defined with variable
+	# https://github.com/heroku/buildpacks/blob/main/docs/python/README.md
 	uv pip compile  requirements/${ENVIRONMENT}.in -U --output-file requirements.txt
-build:
+build-pack:
 	# pack build ${DOCKER_REGISTRY} --builder paketobuildpacks/builder-jammy-base --platform linux/arm64
 	pack build ${DOCKER_REGISTRY} --builder heroku/builder:24
+build-requirements:
+	uv pip compile requirements/${ENVIRONMENT}.in -U --output-file requirements/${ENVIRONMENT}.txt
+build-dockerfile:
+	DOCKER_REGISTRY=${DOCKER_REGISTRY} ENVIRONMENT=${ENVIRONMENT} docker compose build
 docker_login: ## Login to Dockerhub
 	docker login -u methizul -p "$$(pass methizul/docker/password)" docker.io
 
