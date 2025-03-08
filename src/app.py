@@ -5,15 +5,21 @@ from fastapi import FastAPI, Request
 
 from parse import get_netflix_link
 from selenium_utils.selenium_task import open_link_and_click
-from utils.logger import logger
+from utils.logger import EndpointFilter, logger
 from utils.constants import PORT, SELENIUM_USER_DATA_DIR
+import uvicorn
 
 app = FastAPI()
-
 
 @app.get("/")
 def read_root():
     return {"message": "Welcome to FastAPI!"}
+
+@app.get("/readyz/")
+@app.get("/health/")
+@app.get("/livez/")
+def read_root():
+    return {"message": "ok"}
 
 
 @app.post("/webhook/")
@@ -45,8 +51,6 @@ async def webhook(request: Request):
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     logger.info(f"Start listening on PORT:{PORT}")
     logger.info(f"Using selenium user data dir: {SELENIUM_USER_DATA_DIR}")
-    uvicorn.run("app:app", port=PORT, log_level="info", reload=True, host="0.0.0.0")
+    uvicorn.run("app:app", port=PORT, reload=True, host="0.0.0.0")
