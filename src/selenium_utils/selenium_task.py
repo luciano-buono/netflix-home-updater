@@ -94,7 +94,7 @@ def load_cookies(driver, filepath):
 
 def open_link_and_click(link):
     options = webdriver.ChromeOptions()
-    # options.add_argument("--headless")  # Run Chrome in headless mode
+    options.add_argument("--headless")  # Run Chrome in headless mode
     options.add_argument("--no-sandbox")  # Bypass OS security restrictions
     options.add_argument("--disable-dev-shm-usage")  # Prevent shared memory issues
     options.add_argument(f"--user-data-dir={SELENIUM_USER_DATA_DIR}")
