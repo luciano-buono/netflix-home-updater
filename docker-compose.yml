@@ -11,6 +11,8 @@ services:
   python-app:
     build: .
     image: ${DOCKER_REGISTRY}
+    ports:
+      - 8000:8000
     container_name: python-selenium
     depends_on:
       - selenium

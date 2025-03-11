@@ -1,7 +1,7 @@
 from email import message_from_bytes
 from email.message import Message
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 
 from parse import get_netflix_link
 from selenium_utils.selenium_task import open_link_and_click
@@ -44,11 +44,12 @@ async def webhook(request: Request):
         content_type = email_message.get_content_type()
         if content_type == "text/plain":
             email_data = email_message.as_string()
-
-    link = get_netflix_link(email_data=email_data)
-    logger.info(f"Link parsed from 📧: {link}")
-    open_link_and_click(link)
-
+    try:
+        link = get_netflix_link(email_data=email_data)
+        logger.info(f"Link parsed from 📧: {link}")
+        open_link_and_click(link)
+    except:
+        raise HTTPException(status_code=404, detail="Parse link error")
 
 if __name__ == "__main__":
     logger.info(f"Start listening on PORT:{PORT}")
