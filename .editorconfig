@@ -28,3 +28,8 @@ indent_size = 2
 
 [docker-compose.yml]
 indent_style = space
+
+# tabs 2 spaces for makefiles
+[Makefile]
+indent_style = tab
+indent_size = 2

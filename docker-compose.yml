@@ -1,0 +1,27 @@
+services:
+  selenium:
+    image: selenium/standalone-chromium
+    container_name: selenium-chrome
+    ports:
+      - "4444:4444" # Selenium WebDriver API
+      - "7900:7900" # VNC Server for debugging
+    shm_size: "2g" # Prevent Chrome crashes (shared memory)
+    volumes:
+      - ./docker/chrome-data:/home/seluser/userdata
+  python-app:
+    build: .
+    image: ${DOCKER_REGISTRY}
+    ports:
+      - 8000:8000
+    container_name: python-selenium
+    depends_on:
+      - selenium
+    volumes:
+      - ./src/:/app
+    environment:
+      - NETFLIX_EMAIL=FILL
+      - NETFLIX_PASSWORD=FILL
+      - SELENIUM_REMOTE_URL=http://selenium:4444/wd/hub
+    working_dir: /app
+    tty: true
+    command: ["sleep", "infinity"]
