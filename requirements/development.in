@@ -1,7 +1,7 @@
 # Packages used for development
 -r base.in
 
-coverage
+# coverage
 # flake8
 # pep8
 # autopep8
