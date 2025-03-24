@@ -1,5 +1,6 @@
 import logging
 
+
 class EndpointFilter(logging.Filter):
     def __init__(
         self,
@@ -12,7 +13,6 @@ class EndpointFilter(logging.Filter):
 
     def filter(self, record: logging.LogRecord) -> bool:
         return record.getMessage().find(self._path) == -1
-
 
 
 formatter = logging.Formatter("%(asctime)s  %(levelname)s: %(message)s")

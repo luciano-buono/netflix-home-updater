@@ -14,7 +14,7 @@ options.add_argument("--no-sandbox")  # Required for Docker
 
 
 # options.add_argument("user-data-dir=selenium-cache/")
-options.add_argument('--user-data-dir=/home/seluser/userdata')
+options.add_argument("--user-data-dir=/home/seluser/userdata")
 
 # options.add_argument('--profile-directory=selenium-profile')
 

@@ -1,6 +1,7 @@
 import os
 from email import message_from_file
 from email.message import Message
+
 from utils.logger import logger
 
 NETFLIX_LINK_START = ["https://www.netflix.com/account/update-primary", "https://www.netflix.com/account/set-primary"]
