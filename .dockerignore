@@ -2,3 +2,4 @@ credentials.json
 token.json
 sample_email.eml
 __pycache__/
+.makerc

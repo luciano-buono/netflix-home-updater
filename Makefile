@@ -7,7 +7,9 @@
 #
 # ============================================================================
 
-DOCKER_REGISTRY=methizul/netflix-home-updater
+# Include sensitive variables to be exported
+include .makerc
+
 ENVIRONMENT=development
 VERSION?=0.1
 
@@ -29,7 +31,7 @@ build-requirements:
 build-dockerfile:
 	DOCKER_REGISTRY=${DOCKER_REGISTRY} ENVIRONMENT=${ENVIRONMENT} docker compose build
 docker_login: ## Login to Dockerhub
-	docker login -u methizul -p "$$(pass methizul/docker/password)" docker.io
+	docker login -u ${DOCKER_USER} -p "$$(pass ${DOCKER_PASSWORD_PASSCLI})" docker.io
 
 docker_push: ## Pull image from ECR and push to Dockerhub
 	docker tag ${DOCKER_REGISTRY}:latest ${DOCKER_REGISTRY}:${VERSION}
