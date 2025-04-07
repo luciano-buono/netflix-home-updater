@@ -1,3 +1,6 @@
+# Netflix home updater
+Netflix home updater is a python API that automatically parses and find the location update button from an email and click the confirmation link in it.
+
 ![alt text](_docs/diagram.drawio.png)
 
 ## Components
