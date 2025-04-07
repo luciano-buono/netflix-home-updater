@@ -1,9 +1,11 @@
 # Netflix home updater
+
 Netflix home updater is a python API that automatically parses and find the location update button from an email and click the confirmation link in it.
 
 ![alt text](_docs/diagram.drawio.png)
 
 ## Components
+
 - Outlook forward rule (or any mail that allows to creates forward rules using recipient and subjects)
 - Domain and ability to create MX record for it
 - Sendgrid account using [Inbound parse webhook](https://www.twilio.com/docs/sendgrid/for-developers/parsing-email/setting-up-the-inbound-parse-webhook)
@@ -11,7 +13,8 @@ Netflix home updater is a python API that automatically parses and find the loca
 - Selenium parsing HTML and clicking on Netflix button
 - Selenium standalone-chromium container
 
-## Contributors:
+## Contributors
+
 - [@julio-jg](https://github.com/juliojg)
 
 ## Install with docker

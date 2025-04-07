@@ -2,19 +2,11 @@
 .DEFAULT_GOAL := help
 .ONESHELL:
 
-# ----------------------------------------------------------------------------
-# Local Variables
-#
-# ============================================================================
-
 # Include sensitive variables to be exported
 include .makerc
 
 ENVIRONMENT=development
 VERSION?=0.1
-
-help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "⚡ \033[34m%-30s\033[0m %s\n", $$1, $$2}'
 
 build-pack-requirements:
 	# TODO: Right now requirements file is loaded hardcoded in project.toml
@@ -32,7 +24,6 @@ build-dockerfile:
 	DOCKER_REGISTRY=${DOCKER_REGISTRY} ENVIRONMENT=${ENVIRONMENT} docker compose build
 docker_login: ## Login to Dockerhub
 	docker login -u ${DOCKER_USER} -p "$$(pass ${DOCKER_PASSWORD_PASSCLI})" docker.io
-
 docker_push: ## Pull image from ECR and push to Dockerhub
 	docker tag ${DOCKER_REGISTRY}:latest ${DOCKER_REGISTRY}:${VERSION}
 	docker push ${DOCKER_REGISTRY}:latest
