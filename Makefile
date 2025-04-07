@@ -21,6 +21,7 @@ build-pack-requirements:
 	# https://github.com/heroku/buildpacks/blob/main/docs/python/README.md
 	uv pip compile  requirements/${ENVIRONMENT}.in -U --output-file requirements.txt
 build-pack:
+	# TODO: check if buildpack works now that we use separate container for selenium
 	# pack build ${DOCKER_REGISTRY} --builder paketobuildpacks/builder-jammy-base --platform linux/arm64
 	pack build ${DOCKER_REGISTRY} --builder heroku/builder:24
 build-requirements:

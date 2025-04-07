@@ -1,8 +1,4 @@
 ---
-# if you get errors
-# The unauthenticated git protocol on port 9418 is no longer supported.
-# solution:
-# git config --global url."https://".insteadOf git://
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
