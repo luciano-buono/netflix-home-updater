@@ -1,24 +1,26 @@
 from email import message_from_bytes
 from email.message import Message
 
-from fastapi import FastAPI, Request, HTTPException
+import uvicorn
+from fastapi import FastAPI, HTTPException, Request
 
 from parse import get_netflix_link
 from selenium_utils.selenium_task import open_link_and_click
-from utils.logger import EndpointFilter, logger
 from utils.constants import PORT, SELENIUM_USER_DATA_DIR
-import uvicorn
+from utils.logger import logger
 
 app = FastAPI()
+
 
 @app.get("/")
 def read_root():
     return {"message": "Welcome to FastAPI!"}
 
+
 @app.get("/readyz/")
 @app.get("/health/")
 @app.get("/livez/")
-def read_root():
+def livez():
     return {"message": "ok"}
 
 
@@ -35,9 +37,7 @@ async def webhook(request: Request):
             content_disposition = part.get("Content-Disposition")
 
             # Extract plain text body
-            if content_type == "text/plain" and "attachment" not in str(
-                content_disposition
-            ):
+            if content_type == "text/plain" and "attachment" not in str(content_disposition):
                 email_data = part.as_string()
     else:
         # If email is not multipart, extract the payload directly
@@ -48,8 +48,9 @@ async def webhook(request: Request):
         link = get_netflix_link(email_data=email_data)
         logger.info(f"Link parsed from 📧: {link}")
         open_link_and_click(link)
-    except:
+    except Exception:
         raise HTTPException(status_code=404, detail="Parse link error")
+
 
 if __name__ == "__main__":
     logger.info(f"Start listening on PORT:{PORT}")

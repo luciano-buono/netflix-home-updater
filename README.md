@@ -1,6 +1,44 @@
-Link to follow to get to the final page:
-<a href="https://www.netflix.com/account/update-primary-location?nftoken=BgjolOvcAxKkASZ5TMio9qmInp4JW6uU6UJdlYTA4h/sOC8HqqhK6afG5bYnncPn4iOMFKIIHRSy6QUDKtSrQL/y+0qDOts6Jr0OOgtz0Ihpjex88lon6XGCvrIm9LcX9j8Z/JsPqaFZujG7/PKTNGFdckY29v0WJjaKdEIY4wC3uRkvRfoRtgQSXyfPiYw/qNv9X1U5KxU8e5sPZw1JqJ0hP3uGQIa3U90X31I+GAYiDgoMq8ICa8jLidlIe0ma&amp;g=6a491617-0848-49cb-bdb8-0d57f69c762d&amp;lnktrk=EVO&amp;operation=update&amp;lkid=UPDATE_HOUSEHOLD_REQUESTED_OTP_CTA" style="font-family:'Netflix Sans',Helvetica,Roboto,Segoe UI,sans-serif;font-weight:700;font-size:14px;line-height:17px;letter-spacing:-0.2px;text-align:center;text-decoration:none;display:block;color:rgb(255,255,255)" target="_blank" data-saferedirecturl="https://www.google.com/url?q=https://www.netflix.com/account/update-primary-location?nftoken%3DBgjolOvcAxKkASZ5TMio9qmInp4JW6uU6UJdlYTA4h/sOC8HqqhK6afG5bYnncPn4iOMFKIIHRSy6QUDKtSrQL/y%2B0qDOts6Jr0OOgtz0Ihpjex88lon6XGCvrIm9LcX9j8Z/JsPqaFZujG7/PKTNGFdckY29v0WJjaKdEIY4wC3uRkvRfoRtgQSXyfPiYw/qNv9X1U5KxU8e5sPZw1JqJ0hP3uGQIa3U90X31I%2BGAYiDgoMq8ICa8jLidlIe0ma%26g%3D6a491617-0848-49cb-bdb8-0d57f69c762d%26lnktrk%3DEVO%26operation%3Dupdate%26lkid%3DUPDATE_HOUSEHOLD_REQUESTED_OTP_CTA&amp;source=gmail&amp;ust=1740529089274000&amp;usg=AOvVaw1Fdtbo6XihAtuEA4gcm7Bt">Yes,
-This Was Me</a>
+![alt text](_docs/diagram.drawio.png)
 
-Button to press on the final page:
-<button class="pressable_styles__a6ynkg0 button_styles__1kwr4ym0  default-ltr-cache-1pc1doh e1ax5wel2" data-uia="set-primary-location-action" dir="ltr" role="button" type="button">Confirmar actualización</button>
+## Components
+- Outlook forward rule (or any mail that allows to creates forward rules using recipient and subjects)
+- Domain and ability to create MX record for it
+- Sendgrid account using [Inbound parse webhook](https://www.twilio.com/docs/sendgrid/for-developers/parsing-email/setting-up-the-inbound-parse-webhook)
+- FastAPI webserver listening for POST requests
+- Selenium parsing HTML and clicking on Netflix button
+- Selenium standalone-chromium container
+
+## Contributors:
+- [@julio-jg](https://github.com/juliojg)
+
+## Install with docker
+
+```bash
+docker compose build
+docker compuse up -d
+
+```
+
+Compose uses 2 containers, one with webserver and second one with standalone selenium.
+We decided on this because selenium does not have a lot of support in ARM64 architectures using the local browser inside the same webserver.
+More info here: https://github.com/SeleniumHQ/docker-selenium#browser-images-in-multi-arch
+
+## Local development
+
+```bash
+uv init .
+uv pip install
+```
+
+## Setup
+
+1. Define the email you want to use for the webhook. For example, if you domain is domain.com, you can use:
+  - info@netflix-checker.domain.com
+2. Add a rule in your real email where you receive Netflix Household updates in which you forward the emails from "info@account.netflix.com" <info@account.netflix.com> to your webkook email.
+ - You can further filter this by only sending emails based on specific subjects
+3. In your Sendgrid/Twilio account, set up an Inbound parse webhook using the email defined above and selecting your server URL, for example:
+  - netflix-home-updater.k3s.domain.com
+  - You will also need to add MX records in your domain in order to allow Sendgrid to process this emails (Check docs for setup)[1](https://www.twilio.com/docs/sendgrid/for-developers/parsing-email/setting-up-the-inbound-parse-webhook)
+4. Start your webserver, define your netflix user/password as `NETFLIX_EMAIL` `NETFLIX_PASSWORD` inside env vars.
+
+If using K8s/docker remember to persist the `SELENIUM_USER_DATA_DIR` folder, so the browser won't need to login into Netflix each time the workflow is ran.

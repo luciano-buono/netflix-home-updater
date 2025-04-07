@@ -4,5 +4,7 @@ __pycache__
 __pycache__/*
 credentials.json
 token.json
+sample_email.eml
 selenium-cache
 docker/
+.makerc

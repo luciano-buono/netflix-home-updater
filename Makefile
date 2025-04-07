@@ -7,7 +7,9 @@
 #
 # ============================================================================
 
-DOCKER_REGISTRY=methizul/netflix-home-updater
+# Include sensitive variables to be exported
+include .makerc
+
 ENVIRONMENT=development
 VERSION?=0.1
 
@@ -21,6 +23,7 @@ build-pack-requirements:
 	# https://github.com/heroku/buildpacks/blob/main/docs/python/README.md
 	uv pip compile  requirements/${ENVIRONMENT}.in -U --output-file requirements.txt
 build-pack:
+	# TODO: check if buildpack works now that we use separate container for selenium
 	# pack build ${DOCKER_REGISTRY} --builder paketobuildpacks/builder-jammy-base --platform linux/arm64
 	pack build ${DOCKER_REGISTRY} --builder heroku/builder:24
 build-requirements:
@@ -28,7 +31,7 @@ build-requirements:
 build-dockerfile:
 	DOCKER_REGISTRY=${DOCKER_REGISTRY} ENVIRONMENT=${ENVIRONMENT} docker compose build
 docker_login: ## Login to Dockerhub
-	docker login -u methizul -p "$$(pass methizul/docker/password)" docker.io
+	docker login -u ${DOCKER_USER} -p "$$(pass ${DOCKER_PASSWORD_PASSCLI})" docker.io
 
 docker_push: ## Pull image from ECR and push to Dockerhub
 	docker tag ${DOCKER_REGISTRY}:latest ${DOCKER_REGISTRY}:${VERSION}

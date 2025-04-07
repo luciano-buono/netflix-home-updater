@@ -18,18 +18,16 @@ from utils.constants import (
 from utils.logger import logger
 
 COOKIE_FILE = "netflix_cookies.pkl"
-REQUEST_WAIT_TIME = 5
+REQUEST_WAIT_TIME = 2
 
 
 def handle_confirm(driver):
-    logger.info("Attemting to update household..")
+    logger.info("Attempting to update household..")
     if element_present(driver, By.CSS_SELECTOR, "div[data-uia='upl-invalid-token']"):
         logger.warning("Link not valid. probably expired")
         return 1
     confirmation_button = WebDriverWait(driver, REQUEST_WAIT_TIME).until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, "button[data-uia='set-primary-location-action']")
-        )
+        EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-uia='set-primary-location-action']"))
     )
     confirmation_button.click()
     logger.info("Household updated")
@@ -37,11 +35,9 @@ def handle_confirm(driver):
 
 def element_present(driver, by, locator):
     try:
-        WebDriverWait(driver, REQUEST_WAIT_TIME).until(
-            EC.presence_of_element_located((by, locator))
-        )
+        WebDriverWait(driver, REQUEST_WAIT_TIME).until(EC.presence_of_element_located((by, locator)))
         return True
-    except:
+    except Exception:
         return False
 
 
@@ -70,9 +66,7 @@ def handle_login(driver, email, password):
     except TimeoutException:
         print("Login elements not found. Assuming user is already logged in.")
         confirmation_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, "button[data-uia='set-primary-location-action']")
-            )
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-uia='set-primary-location-action']"))
         )
         confirmation_button.click()
 
