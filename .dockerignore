@@ -1,5 +1,11 @@
+.pytest_cache
+.venv/
+__pycache__
+__pycache__/*
 credentials.json
 token.json
 sample_email.eml
-__pycache__/
+selenium-cache
+docker/
 .makerc
+.DS_Store

@@ -8,3 +8,4 @@ sample_email.eml
 selenium-cache
 docker/
 .makerc
+.DS_Store
