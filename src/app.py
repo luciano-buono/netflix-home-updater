@@ -8,7 +8,7 @@ from parse import get_netflix_link
 from selenium_utils.selenium_task import open_link_and_click
 from utils.constants import PORT, SELENIUM_USER_DATA_DIR
 from utils.logger import logger
-
+import time
 app = FastAPI()
 
 
@@ -27,6 +27,7 @@ def livez():
 @app.post("/webhook/")
 async def webhook(request: Request):
     """Receive raw email from SendGrid and extract plain text & HTML content."""
+    start_time = time.monotonic()  # Start the timer
     raw_email = await request.body()  # Get the raw email bytes
     email_message: Message = message_from_bytes(raw_email)  # Parse email content
 
@@ -51,6 +52,9 @@ async def webhook(request: Request):
     except Exception:
         raise HTTPException(status_code=404, detail="Parse link error")
 
+    end_time = time.monotonic()  # End the timer
+    elapsed = end_time - start_time
+    logger.info(f"⏱️ Webhook processing completed in {elapsed:.2f} seconds")
 
 if __name__ == "__main__":
     logger.info(f"Start listening on PORT:{PORT}")
