@@ -1,7 +1,16 @@
 [project]
 name = "netflix-home-updater"
 version = "0.1.0"
-description = "Add your description here"
+description = "Automatically confirm Netflix household updates from email webhooks"
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = []
+requires-python = ">=3.15"
+dependencies = [
+    "fastapi>=0.115.11",
+    "selenium>=4.29.0",
+    "uvicorn>=0.34.0",
+]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.0.1",
+]
