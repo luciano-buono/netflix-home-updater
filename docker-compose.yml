@@ -9,8 +9,12 @@ services:
     volumes:
       - ./docker/chrome-data:/home/seluser/userdata
   python-app:
-    build: .
-    image: ${DOCKER_REGISTRY}
+    platform: linux/arm64
+    build:
+      context: .
+      platforms:
+        - linux/arm64
+    image: ${DOCKER_REGISTRY}:${VERSION:?VERSION is required; set VERSION=2.0}
     ports:
       - 8000:8000
     container_name: python-selenium
@@ -24,4 +28,3 @@ services:
       - SELENIUM_REMOTE_URL=http://selenium:4444/wd/hub
     working_dir: /app
     tty: true
-    command: ["sleep", "infinity"]
