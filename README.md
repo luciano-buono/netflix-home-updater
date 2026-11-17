@@ -79,4 +79,32 @@ Run `make help` for available shortcuts.
 3. In your Sendgrid/Twilio account, set up an Inbound parse webhook using the email defined above and your server URL, for example `netflix-home-updater.k3s.domain.com`. Add MX records in your domain to allow Sendgrid to process these emails; see the [setup docs](https://www.twilio.com/docs/sendgrid/for-developers/parsing-email/setting-up-the-inbound-parse-webhook).
 4. Start your webserver and define your Netflix user/password as `NETFLIX_EMAIL` and `NETFLIX_PASSWORD` environment variables.
 
+### Alternative: dedicated Netflix address with Cloudflare Email Routing
+
+Use this instead of step 2 when your mail provider flags outbound forwarding (Outlook does).
+The Netflix account uses `netflix@domain.com`; a Cloudflare Email Worker sends each email to
+your personal inbox and, for mail from `@account.netflix.com`, to the Inbound Parse address too.
+Your personal inbox never forwards anything.
+
+1. In Cloudflare **Email > Email Routing > Destination addresses**, add and verify your personal
+   inbox and the Inbound Parse address (e.g. `info@netflix-checker.domain.com`). The second
+   verification email goes through SendGrid to the webhook, so read its link from the request body
+   (for example, point Inbound Parse at a request inspector for a minute, then restore the URL).
+2. Deploy the Worker in `cloudflare/email-router`:
+
+   ```bash
+   cd cloudflare/email-router
+   npx wrangler deploy
+   npx wrangler secret put PERSONAL_INBOX
+   npx wrangler secret put CHECKER_INBOX
+   ```
+
+3. In **Email Routing > Routing rules**, create custom address `netflix@domain.com` with action
+   **Send to a Worker** → `netflix-email-router`.
+4. Change the Netflix account email to `netflix@domain.com`, update `NETFLIX_EMAIL` in the
+   deployment, and remove the old forward rule from your personal inbox.
+
+The `netflix-checker` subdomain keeps its own `mx.sendgrid.net` MX record; the root domain uses
+the Cloudflare MX records.
+
 If using K8s/docker remember to persist the `SELENIUM_USER_DATA_DIR` folder, so the browser won't need to login into Netflix each time the workflow is ran.

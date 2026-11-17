@@ -1,0 +1,7 @@
+name = "netflix-email-router"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+# Destination addresses are set as secrets, not committed:
+#   npx wrangler secret put PERSONAL_INBOX   # your Outlook address
+#   npx wrangler secret put CHECKER_INBOX    # e.g. info@netflix-checker.<domain>
