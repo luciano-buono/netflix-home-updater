@@ -1,10 +1,12 @@
 import os
+import re
 from email import message_from_file
 from email.message import Message
 
 from utils.logger import logger
 
 NETFLIX_LINK_START = ["https://www.netflix.com/account/update-primary", "https://www.netflix.com/account/set-primary"]
+NETFLIX_LINK_RE = re.compile("(?:" + "|".join(re.escape(s) for s in NETFLIX_LINK_START) + r")[^\s<>\[\]\"]*")
 
 
 def parse_email_from_file(file_path: str):
@@ -21,26 +23,21 @@ def parse_email_from_file(file_path: str):
 
 
 def get_netflix_link(email_data):
-    email_data = email_data.split("--xYzZY")
-    for dat in email_data:
+    txt = email_data
+    for dat in email_data.split("--xYzZY"):
         if 'Content-Disposition: form-data; name="text"' in dat:
-            txt = dat.split('"text"')[1]
+            txt = dat.split('"text"', 1)[1]
             break
 
-    for s in NETFLIX_LINK_START:
-        idx_start = txt.find(s)
-        if idx_start != -1:
-            break
-        if idx_start == -1:
-            logger.info(
-                "Unable to parse the correct link in the Email. "
-                "Maybe the search string is not correct anymore or the Email is not a update Email?"
-            )
-
-    update_link = txt[idx_start:-1]
-    idx_end = update_link.find(">\n")
-    update_link = update_link[0:idx_end]
-    return update_link
+    # Links appear as <url> (Outlook-forwarded) or [url] (original Netflix text part).
+    match = NETFLIX_LINK_RE.search(txt)
+    if not match:
+        logger.info(
+            "Unable to parse the correct link in the Email. "
+            "Maybe the search string is not correct anymore or the Email is not a update Email?"
+        )
+        raise ValueError("Netflix update link not found")
+    return match.group(0)
 
 
 if __name__ == "__main__":
